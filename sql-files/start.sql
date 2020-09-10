@@ -1054,7 +1054,7 @@ CREATE TABLE `login` (
 -- ----------------------------
 -- Records of login
 -- ----------------------------
-INSERT INTO `login` VALUES ('1', 'starttemplateid', 'starttemplatepw', 'S', 'athena@athena.com', '0', '0', '0', '0', '0', null, '', null, '0', '', '0', '0', '0', null, '0');
+INSERT INTO `login` VALUES ('1', 'oooo', 'oooo', 'S', 'athena@athena.com', '0', '0', '0', '0', '0', null, '', null, '0', '', '0', '0', '0', null, '0');
 
 -- ----------------------------
 -- Table structure for loginlog

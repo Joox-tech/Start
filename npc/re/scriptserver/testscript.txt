@@ -1,0 +1,2 @@
+brasilis,159,138,6	script	Save	10010,{
+	atcommand "@save";}

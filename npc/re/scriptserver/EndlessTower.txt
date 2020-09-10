@@ -202,7 +202,7 @@ alberta,214,77,6	script	Captain Janssen	709,{
 	}
 }
 
-e_tower,81,105,0	script	Tower Protection Stone	406,{
+brasilis,209,123,6	script	Tower Protection Stone	406,{
 
 	set .@party_id,getcharid(1);
 	set .@md_name$,"Endless Tower";
@@ -2125,7 +2125,7 @@ OnMyMobDead:
 	mes "[Lost Souls]";
 	mes "Thank you so much. Now we can escape from this cold and dark place... to heaven.";
 	next;
-	if ((countitem(13412) > 0) && (countitem(13413) > 0)) {
+	if ((countitem(671) > 5000) && (countitem(7227) > 500)) {
 		mes "[Lost Souls]";
 		mes "Hey, you have the remnants of Nacht Sieger with you.";
 		next;
@@ -2144,7 +2144,7 @@ OnMyMobDead:
 				next;
 				delitem 13412,1; //Twin_Edge_B
 				delitem 13413,1; //Twin_Edge_R
-				getitem 1185,1; //Violet_Fear
+				getitem 671,5000; //Violet_Fear
 				break;
 			case 2:
 				mes "[Lost Souls]";

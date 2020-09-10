@@ -1,0 +1,68 @@
+brasilis,256,59,1	script	Fishing Hole	933,{
+	
+//Fishing rod เบ็ดตกปลา
+set .@Rod,2764;
+//Fishing Lure เหยื่อตกปลา
+set .@Lure,2775;
+//Auto-Fish ตกปลาออโต้
+set .@Auto,1;
+//Auto-Fish on Fail พลาดแล้วตกปลาต่อ
+set .@AutoFail,1;
+Fish:
+	if (isequipped(.@Rod)) && (isequipped(.@Lure)){
+		specialeffect EF_BUBBLE,"Fishing Hole";
+		soundeffect 
+		dispbottom 
+		set .@fcast,15;
+			if (isequipped(2550)) { //Fisher's Muffler ผ้าคลุมตกปลา
+				set .@fcast,.@fcast - 2;
+			}
+			if (isequipped(2443)) { //Fisher's Boots รองเท้าตกปลา
+				set .@fcast,.@fcast - 2;
+			}
+			if (isequipped(2764)) { //Fishing Pole เบ็ดตกปลา
+				set .@fcast,.@fcast - 3;
+			}
+			if (isequipped(2775)) { //Fishing Lure เหยื่อตกปลา
+				set .@fcast,.@fcast - 1;
+			}
+		progressbar "ffffff",.@fcast;
+		if (rand(1,20) == 2){
+		getitem 6096,1; //Fish with Blue Back
+		specialeffect2 EF_TEMP_OK;
+		soundeffectall 
+		mapannounce strcharinfo(3),strcharinfo(0)+" ตกปลา Blue Fish ได้!",bc_map,"0xff77ff";
+		if(.@Auto==1){
+		goto Fish;}else{
+		end;}
+		}
+			if (rand(1,6) == 1) ||(rand(1,6) == 3) || (rand(1,6) == 6){
+			setarray .@Catch[0],579,908,909,963,956,6049,918,960,910,938,624;// List of Junk/Other รายชื่อขยะ/อื่นๆ
+			set .@CatchRand,.@Catch[rand(getarraysize(.@Catch))];
+			getitem .@CatchRand,1;
+			}
+			else {
+			dispbottom "[ระบบตกปลา] ตกไม่ได้อะไรเลย...";
+			if(.@AutoFail == 1){
+			goto Fish;} else{
+			end;}
+			}
+		if (rand(1,100) == 3){
+		setarray .@Rare[0],671,7227,6153; // ได้ของแรร์
+		set .@RareCatch, .@Rare[rand(getarraysize(.@Rare))];
+		getitem .@RareCatch,1; //Reward รางวัล
+		mapannounce strcharinfo(3),strcharinfo(0)+" ตกได้ "+getitemname(.@RareCatch)+"!",bc_map,"0x33CC00";
+		}
+		if(.@Auto == 1){
+		goto Fish;} else{
+		end;}
+		}
+	else {
+	dispbottom "[ระบบตกปลา] เจ้าต้องมีเบ็ดและเหยื่อก่อน.";
+	end;
+	}
+}
+brasilis,245,59,5	duplicate(School of Fish)	School of Fish#1 742
+morocc,159,96,5	duplicate(School of Fish)	School of Fish#2 742
+morocc,159,96,5	duplicate(School of Fish)	School of Fish#3 742
+morocc,159,96,5	duplicate(School of Fish)	School of Fish#4 742

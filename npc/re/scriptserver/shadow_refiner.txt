@@ -1,0 +1,153 @@
+//===== rAthena Script =======================================
+//= Shadow Blacksmith
+//===== Description: =========================================
+//= [Official Conversion]
+//= Shadow equipments refining NPC.
+//===== Changelog: ===========================================
+//= 1.0 First version [Aleos]
+//= 1.1 Removed re-roll behavior and fetch materials from db 
+//=     [Secret]
+//============================================================
+-	script	::ShadowBlacksmith	-1,{
+	.@zeny_cost = 200000; // Zeny cost is 200,000 according to official script [Secret]
+	disable_items;
+	mes "[Shadow Blacksmith]";
+	mes "เจ้าต้องการตีบวกไอเท็มชาโดว์ไหม ? เลือกมาสิ!";
+	next;
+	setarray .@indices[1], EQI_SHADOW_ARMOR, EQI_SHADOW_WEAPON, EQI_SHADOW_SHIELD, EQI_SHADOW_SHOES, EQI_SHADOW_ACC_R, EQI_SHADOW_ACC_L;
+	.@indlen = getarraysize(.@indices) - 1;
+	for(.@i = 1; .@i <= .@indlen; .@i++)
+		.@menu$ = .@menu$ + (getequipisequiped(.@indices[.@i]) ? getequipname(.@indices[.@i]) : F_getpositionname(.@indices[.@i]) +"-[ไม่ได้สวมใส่]") +":";
+	.@menu$ = .@menu$ + "รายละเอียดการตีบวก";
+	.@choice = select(.@menu$);
+	if (.@choice == .@indlen + 1) { // Refine info
+		mes "[Shadow Blacksmith]";
+		mes "เมื่อตีบวกไอเท็มชาโดว์สำเร็จ, มันจะให้ค่าโบนัสพิเศษคล้ายๆกับไอเท็มทั่วไป.";
+		next;
+		mes "[Shadow Blacksmith]";
+		mes "อาวุธ: ATK, MATK + 1 มันจะเพิ่มขึ้นทุกครั้งที่บวก +1 สำเร็จ.";
+		mes "อื่นๆ: HP + 10 มันจะเพิ่มขึ้นทุกครั้งที่บวก +1 สำเร็จ.";
+		next;
+		mes "[Shadow Blacksmith]";
+		mes "แร่จำพวก Oridecon และ Elunium สามารถใช้ตีบวกไอเท็มชาโดว์ได้. แต่ละครั้งจ่ายเพียง 20,000 zeny.";
+		next;
+		mes "[Shadow Blacksmith]";
+		mes "HD ores สามารถใช้ตีบวกของสวมใส่ที่บวกอย่างน้อยระดับ +7 และมันอาจโดนลดเลเวลบวกได้ตราบเท่าที่เจ้ายังคุยกับข้า.";
+		close;
+	}
+	
+	.@part = .@indices[.@choice];
+	
+	if (!getequipisequiped(.@part)) {
+		mes "[Shadow Blacksmith]";
+		mes "ไม่เห็นมีอะไรเลย!";
+		close;
+	}
+	
+	while(1) {
+		mes "[Shadow Blacksmith]";
+		mes "ข้าต้องการ " + callfunc("F_InsertComma", .@zeny_cost) + " zeny เป็นค่าธรรมเนียมในการบวก.";
+		mes "เลือกแร่และมาเริ่มทำกันเลย.";
+		next;
+		.@isNormalEqp = 0;
+		if (.@part != EQI_SHADOW_WEAPON)
+			.@isNormalEqp = 1;
+		
+		.@material[0] = getequiprefinecost(.@part, REFINE_COST_NORMAL, REFINE_MATERIAL_ID);
+		.@material[1] = getequiprefinecost(.@part, REFINE_COST_ENRICHED, REFINE_MATERIAL_ID);
+		.@material[2] = getequiprefinecost(.@part, REFINE_COST_HD, REFINE_MATERIAL_ID);
+		
+		if (countitem(.@material[0]))
+			.@mate$[0] = getitemname(.@material[0]);
+		else {
+			.@mate$[0] = "^8C8C8C"+ getitemname(.@material[0]) +"^000000";
+			.@miss[0] = 1;
+		}
+		if (countitem(.@material[1]))
+			.@mate$[1] = getitemname(.@material[1]);
+		else {
+			.@mate$[1] = "^8C8C8C"+ getitemname(.@material[1]) +"^000000";
+			.@miss[1] = 1;
+		}
+		if (getequiprefinerycnt(.@part) > 6 && countitem(.@material[2]))
+			.@mate$[2] = getitemname(.@material[2]);
+		else {
+			.@mate$[2] = "^8C8C8C"+ getitemname(.@material[2]) +"^000000";
+			.@miss[2] = 1;
+		}
+
+		.@option = select(.@mate$[0],.@mate$[1],.@mate$[2],"ยกเลิก");
+		if (.@option == 4) {
+			mes "[Shadow Blacksmith]";
+			mes "เจ้าได้ยกเลิกการบวก.";
+			close;
+		}
+		else if (.@option == 3) { // HD
+			if (getequiprefinerycnt(.@part) < 7) {
+				mes "[Shadow Blacksmith]";
+				mes "HD Ore ใช้สำหรับบวกไอเท็มที่มีค่าบวกอยู่ที่ +7 หรือสูงกว่าเท่านั้น.";
+				close;
+			}
+			.@hoihoi = 1;
+		}
+		.@choose = .@material[.@option-1];
+		if (!countitem(.@choose)) {
+			mes "[Shadow Blacksmith]";
+			mes "เจ้ามีแร่ "+ getitemname(.@choose) +" ไม่พอ.";
+			close;
+		}
+		if (Zeny < .@zeny_cost) {
+			mes "[Shadow Blacksmith]";
+			mes "เจ้ามีเงินไม่พอ.";
+			close;
+		}
+		if (getequiprefinerycnt(.@part) > 9) {
+			mes "[Shadow Blacksmith]";
+			mes "Shadow Equipment บวกได้สูงสุดแค่บวก 10 เท่านั้น...";
+			close;
+		}
+		if (!getequipisenableref(.@part)) {
+			mes "[Shadow Blacksmith]";
+			mes "ไอเท็มนี้บวกไม่ได้.";
+			close;
+		}
+		if (getequippercentrefinery(.@part) < 100) {
+			mes "[Shadow Blacksmith]";
+			mes "ค่าบวกที่ปลอดภัยของ Shadow Equipment อยู่ที่ +4.";
+			if (!.@hoihoi)
+				mes "Shadow equipment อาจจะเสียหายได้ถ้ายังจะบวกต่อ. ต้องการทำต่อไหม ?";
+			else
+				mes "การบวกครั้งต่อไป, ถ้ามันล้มเหลว, ค่าบวกจะลดลง. เจ้าต้องการบวกไหม ?";
+			next;
+			if (select("ทำเลย","ยกเลิก") == 2) {
+				mes "[Shadow Blacksmith]";
+				mes "ฮิ้ว, เข้าใจแล้ว!";
+				close;
+			}
+		}
+
+		mes "[Shadow Blacksmith]";
+		mes "จะเยี่ยมไปเลย.. ถ้ามันไม่เกิดอะไรขึ้น!";
+		next;
+		delitem .@choose,1;
+		Zeny -= .@zeny_cost;
+		if (getequippercentrefinery(.@part, .@option > 1) > rand(100)) {
+			successrefitem .@part;
+			mes "[Shadow Blacksmith]";
+			mes "ทำได้! ข้าทำมันได้!";
+			next;
+		} else {
+			if (.@hoihoi)
+				downrefitem .@part;
+			else
+				failedrefitem .@part;
+			mes "[Shadow Blacksmith]";
+			mes "โอ้ ม่ายน่าา!";
+			close;
+		}
+	}
+}
+
+//moc_paraup,45,185,5	duplicate(ShadowBlacksmith)	Shadow Blacksmith#eden1	4_F_JOB_BLACKSMITH // Commented out until it's added to the map index
+prt_in,61,54,3	duplicate(ShadowBlacksmith)	Shadow Blacksmith#itemmall	4_F_JOB_BLACKSMITH
+brasilis,163,129,6	duplicate(ShadowBlacksmith)	Shadow Blacksmith#itemmall	4_F_JOB_BLACKSMITH	

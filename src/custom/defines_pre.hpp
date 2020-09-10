@@ -8,7 +8,7 @@
  * rAthena configuration file (http://rathena.org)
  * For detailed guidance on these check http://rathena.org/wiki/SRC/config/
  **/
-
+#define VIP_ENABLE
 
 
 #endif /* CONFIG_CUSTOM_DEFINES_PRE_HPP */

@@ -582,7 +582,7 @@ yuno,162,47,4	duplicate(Warper)	วาร์ป#yuno	10168
 // --------------------------------------------------
 //	Duplicates (Renewal):
 // --------------------------------------------------
-brasilis,201,222,4	duplicate(Warper)	วาร์ป#bra	10168
+brasilis,169,136,6	duplicate(Warper)	วาร์ป#bra	10168
 dewata,204,186,6	duplicate(Warper)	วาร์ป#dew	10168
 dicastes01,194,194,6	duplicate(Warper)	วาร์ป#dic	10168
 ecl_in01,51,60,4	duplicate(Warper)	วาร์ป#ecl	10168

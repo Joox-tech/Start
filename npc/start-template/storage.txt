@@ -1,4 +1,4 @@
-prontera,150,191,5	script	คลังเก็บของ	10005,{
+brasilis,183,146,5	script	คลังเก็บของ	10005,{
 	specialeffect2 65;
 	if(getcharid(2) > 0)
 	menu "เปิดคลังปกติ",L_Storage,"เปิดคลังกิลด์",L_Guild_Storage;

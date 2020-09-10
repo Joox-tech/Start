@@ -1,0 +1,5 @@
+brasilis,194,146,6	script	PVP	10010,{
+atcommand "@warp pvp_y_1-2";
+announce "[ระบบ] ขณะนี้ คุณ [ "+strcharinfo(0)+" ] PVPสุดโหดแล้วจ้า ขณะนี้มีผู้เล่นทั้งหมด [ "+getmapusers("pvp_y_1-2")+" ] คน",0,0x9370DB;
+close;
+}

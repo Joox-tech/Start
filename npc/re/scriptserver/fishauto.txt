@@ -1,0 +1,221 @@
+// =====================================================================
+// ======== modify by Jumbo
+// =====================================================================
+// ======== ร้านขายของตกปลา
+-	shop	fish_sellshop	-1,2764:10000,2775:10000,2550:500000,2443:500000,5317:10000000,5855:10000000
+// =====================================================================
+brasilis,263,79,5	script	NPC ตกปลา	564,{
+	mes "[Jumbo]";
+	mes "หวัดดี, "+strcharinfo(0)+"!";
+	mes "มองหาอะไรอยู่หรอ ?";
+	next;
+		switch(select("ร้านขายของตกปลา:ปลาแลกแต้มพอยท์:ร้านค้าใช้พอยท์ตกปลาซื้อ (^0055FF"+getd(.Points$)+"^000000):รายละเอียด:ออก")) {
+	case 1:
+		callshop "fish_sellshop",0;
+		end;
+	case 2:
+		mes "[Jumbo]";
+		mes "กรุณาเลือกปลา";
+		mes "ที่เจ้าต้องการแลก.";
+		deletearray @sold_nameid[0],getarraysize(@sold_nameid);
+		callshop "fish_shop",2;
+		npcshopattach "fish_shop";
+		end;
+	case 3:
+		mes "[Jumbo]";
+		mes "เจ้ามีพอยท์ตกปลา ^0055FF"+getd(.Points$)+"^000000 แต้ม"+((getd(.Points$) == 1)?".":".");
+		callshop "fish_shop",1;
+		npcshopattach "fish_shop";
+		end;
+	case 4:
+		mes "[Jumbo]";
+		mes "ถ้าเจ้านำปลามาขายข้า";
+		mes "ข้าจะให้เจ้า ^0055FF"+.Points[0]+" แต้ม"+((.Points[0] == 1)?"":"")+"^000000 ต่อตัว";
+		mes "สำหรับปลาทั่วไป, และ";
+		mes "^0055FF"+.Points[1]+" แต้ม^000000 สำหรับ สัตว์ทะเลอย่างอื่น.";
+		next;
+		mes "[Jumbo]";
+		mes "เจ้าสามารถเอาแต้มพอยท์ตกปลา";
+		mes "ไปซื้อของในร้านค้าที่ใช้พอยท์ตกปลาซื้อได้";
+		mes "ฟังดูน่าสนใจไหม ?";
+		end;
+	case 5:
+		end;
+	}
+	
+OnSellItem:
+	mes "รายการปลาที่จะแลก:";
+	mes "-----------------------------------";
+	for(set .@i,0; .@i<getarraysize(@sold_nameid); set .@i,.@i+1)
+		if ((@sold_nameid[.@i] == 6780) || (@sold_nameid[.@i] == 6782) || (@sold_nameid[.@i] == 6902) || (@sold_nameid[.@i] == 6897) || (@sold_nameid[.@i] == 6901)|| (@sold_nameid[.@i] == 6899) || (@sold_nameid[.@i] == 6778) || (@sold_nameid[.@i] == 6775) || (@sold_nameid[.@i] == 6772) || (@sold_nameid[.@i] == 6770) || (@sold_nameid[.@i] == 6779) || (@sold_nameid[.@i] == 6049) || (@sold_nameid[.@i] == 6774) || (@sold_nameid[.@i] == 6773) || (@sold_nameid[.@i] == 6771)) {
+			set .@fish_id[getarraysize(.@fish_id)], @sold_nameid[.@i];
+			set .@fish_amt[getarraysize(.@fish_amt)], @sold_quantity[.@i];
+			set .@mvpfish, compare(.MVPFISH$,""+@sold_nameid[.@i]);
+			mes ((.@mvpfish)?"  ^FF0000":"  ^777777")+@sold_quantity[.@i]+"x "+getitemname(@sold_nameid[.@i])+"^000000";
+			set .@fish_total, .@fish_total+(@sold_quantity[.@i]*((.@mvpfish)?.Points[1]:.Points[0]));
+		}
+	deletearray @sold_nameid[0], getarraysize(@sold_nameid);
+	deletearray @sold_quantity[0], getarraysize(@sold_quantity);
+	if (!.@fish_id) {
+		mes "  ^777777(ไม่มีปลา)^000000";
+		close;
+	}
+	mes " ";
+	mes "---------- รวมทั้งหมด: ^0055FF"+.@fish_total+" แต้ม.^000000 -------";
+	next;
+	if(select(" > ^0055FFแลกเปลี่ยน...^000000: > ^777777ยกเลิก^000000") == 2) {
+		mes "[Jumbo]";
+		mes "โอ้, ได้เลย...";
+		close;
+	}
+	for(set .@i,0; .@i<getarraysize(.@fish_id); set .@i,.@i+1)
+		delitem .@fish_id[.@i],.@fish_amt[.@i];
+	setd .Points$, getd(.Points$)+.@fish_total;
+	mes "[Jumbo]";
+	mes "เรียบร้อย!";
+	mes "เจ้ามีพอยท์ตกปลาเพิ่มเป็น ^0055FF"+getd(.Points$)+"^000000 แต้ม";
+	close;
+		
+OnBuyItem:
+	for(set .@i,0; .@i<getarraysize(@bought_nameid); set .@i,.@i+1)
+		for(set .@j,0; .@j<getarraysize(.Shop); set .@j,.@j+2)
+			if (@bought_nameid[.@i] == .Shop[.@j]) {
+				set .@cost, .@cost+(.Shop[.@j+1]*@bought_quantity[.@i]);
+				break;
+			}
+	if (.@cost > getd(.Points$)) {
+		mes "[Jumbo]";
+		mes "เจ้ามีแต้มพอยท์ตกปลาไม่พอ.";
+	}
+	else {
+		mes "รายการสินค้า:";
+		mes "-----------------------------------";
+		for(set .@i,0; .@i<getarraysize(@bought_nameid); set .@i,.@i+1) {
+			getitem @bought_nameid[.@i], @bought_quantity[.@i];
+			mes "  ^777777"+@bought_quantity[.@i]+"x "+getitemname(@bought_nameid[.@i])+"^000000";
+		}
+		mes " ";
+		mes "---------- รวมทั้งหมด: ^0055FF"+.@cost+" แต้ม.^000000 -------";
+		setd .Points$, getd(.Points$)-.@cost;
+	}
+	deletearray @bought_nameid[0], getarraysize(@bought_nameid);
+	deletearray @bought_quantity[0], getarraysize(@bought_quantity);
+	close;
+
+// =====================================================================
+// ======== Setting
+// =====================================================================	
+OnInit:
+	set .Points$,"#Fish_Points";	// ตัวแปรพอยท์.
+	setarray .Shop[0],		// ร้านค้าขายของพอยท์.: <รหัสไอเท็ม>,<ราคาพอยท์>
+	19735,100,5065,1000,5380,1000,5403,1000,5792,1000,18640,1000,18699,1000,18936,10000;
+	setarray .Points[0],1,50;	// แต้มพอยท์ต่อ <ปลาทั่วไป>,<ปลาแรร์ >
+	set .MVPFISH$,			// รหัสปลาแรร์
+	  "6782,6902,6772,6778,6899";
+	npcshopdelitem "fish_shop",909;
+	for(set .@i,0; .@i<getarraysize(.Shop); set .@i,.@i+2)
+		npcshopadditem "fish_shop",.Shop[.@i],.Shop[.@i+1];
+	waitingroom "ร้านขายของตกปลา",0;		// ป้ายข้อความบนหัว NPC
+	end;
+}
+-	shop	fish_shop	-1,909:-1
+
+// =====================================================================
+// ======== ระบบตกปลา
+// =====================================================================
+prontera,160,172,0	script	จุดตกปลา	10065,{
+Fish:
+	if (( isequipped(2764) ) && ( isequipped(2775) ) && ( BaseLevel >= .fminlv )) || (( isequipped(5855) ) && ( isequipped(2775) ) && ( BaseLevel >= .fminlv )){
+		specialeffect 109;
+		message strcharinfo(0),"[ระบบตกปลา] กำลังตกปลา...";
+		set .fcast, .maxfcast;
+			if (isequipped(5317)) {	// หมวกตกปลา
+				set .fcast, (.fcast - .fcasthat);
+			}
+			if (isequipped(2550)) {	// ผ้าคลุมตกปลา
+				set .fcast, (.fcast - .fcastmuffler);
+			}
+			if (isequipped(2443)) {	// รองเท้าตกปลา
+				set .fcast, (.fcast - .fcastboots);
+			}
+			if (isequipped(5855)) {	// เบ็ดตกปลาขั้นสูง
+				set .fcast, (.fcast - .fcasthighrod);
+			}
+			if (isequipped(2764)) {	// เบ็ดตกปลา
+				set .fcast, (.fcast - .fcastrod);
+			}
+			if (isequipped(2775)) {	// เหยื่อ
+				set .fcast, (.fcast - .fcastlure);
+			}
+		progressbar "ffffff",.fcast;
+		set .randfish, rand(1,100);
+		if ( .randfish <= .rarfish ){
+			setarray .rfish[0],671,6635,6772,6778,6899;		// รหัสปลาแรร์ที่ตกได้
+			set .CatchRfish, .rfish[rand(getarraysize(.rfish))];
+			getitem .CatchRfish,1; // ปลาแรร์
+			specialeffect2 68;
+			mapannounce strcharinfo(3),strcharinfo(0)+" ตกได้ "+getitemname(.CatchRfish)+"!",bc_map,"0x33CC00";
+			if(.Autofish == 1) { goto Fish; }
+			else { end; }
+		}
+		else if ( .randfish <= .sucfish ){
+			setarray .normalfish[0],671,6779,6049,6774,6773,6771,6770,6775,6901,6897;		// รหัสปลาทั่วไปที่ตกได้
+			set .Catchfish, .normalfish[rand(getarraysize(.normalfish))];
+			getitem .Catchfish,1;
+			specialeffect2 610;
+			if(.Autofish == 1) { goto Fish; }
+			else { end; }
+		}
+		else if ( .randfish <= .junkfish ){
+			setarray .junkf[0],7227,1053,951,1023,956,963,950,1052,6635,960,961,1024;	// รหัสขยะที่ตกได้
+			set .Catchjunk,.junkf[rand(getarraysize(.junkf))];
+			getitem .Catchjunk,1;
+			if(.Autofish == 1) { goto Fish; }
+			else { end; }
+		}
+		else {
+			specialeffect2 611;
+			message strcharinfo(0),"[ระบบตกปลา] ตกไม่ได้อะไรเลย...";
+			if(.AutoFail == 1){ goto Fish; }
+			else { end; }
+		}	
+	}	
+	else {
+		if ( BaseLevel < .fminlv ){
+			message strcharinfo(0),"[ระบบตกปลา] เลเวลเจ้าไม่พอ.";
+			end; }
+		message strcharinfo(0),"[ระบบตกปลา] เจ้าต้องมีเบ็ดตกปลาและเหยื่อก่อน.";
+		end;
+	}
+	
+// =====================================================================
+// ======== Setting
+// =====================================================================
+OnInit:
+set .fminlv,50;				// เลเวลขั้นต่ำที่ตกปลาได้
+set .Autofish,1;			// ระบบตกปลาออโต้ 1=เปิด 0=ปิด
+set .AutoFail,1;			// ระบบตกปลาออโต้เมื่อตกล้มเหลว 1=เปิด 0=ปิด
+
+set .maxfcast,16;			// ระยะเวลาตกปลา
+set .fcasthighrod,3;		// ลดระยะเวลาตกปลา เมื่อใส่ เบ็ดตกปลาขั้นสูง
+set .fcastrod,1;			// ลดระยะเวลาตกปลา เมื่อใส่ เบ็ดตกปลา
+set .fcastlure,1;			// ลดระยะเวลาตกปลา เมื่อใส่ เหยื่อ
+set .fcastmuffler,3;		// ลดระยะเวลาตกปลา เมื่อใส่ ผ้าคลุมตกปลา
+set .fcastboots,3;			// ลดระยะเวลาตกปลา เมื่อใส่ รองเท้าตกปลา
+set .fcasthat,4;			// ลดระยะเวลาตกปลา เมื่อใส่ หมวกตกปลา
+
+set .rarfish,1;				// %ตกได้แรร์				[ 1% ] คิดก่อนเสมอ
+set .sucfish,21;			// %ตกได้ปลาทั่วไป				[ 20% }	ลบ % ข้างบนก่อน
+set .junkfish,72;			// %ตกได้ขยะ [ %ที่เหลือคือตกไม่ได้อะไรเลย ]		[ 50% ]	ลบ % สองอันบนก่อน
+//							   %ที่เหลือคือตกไม่ได้อะไรเลย					[ 28% ]	%ที่เหลือจากขยะลบ 100
+}
+
+// =====================================================================
+// ======== วางจุดตกปลาเพิ่ม
+// =====================================================================
+prontera,160,174,0	duplicate(จุดตกปลา)	จุดตกปลา#01	10065
+prontera,162,172,0	duplicate(จุดตกปลา)	จุดตกปลา#02	10065
+prontera,162,174,0	duplicate(จุดตกปลา)	จุดตกปลา#03	10065
+brasilis,246,57,0	duplicate(จุดตกปลา)	จุดตกปลา#04	10065
+brasilis,257,58,0	duplicate(จุดตกปลา)	จุดตกปลา#05	10065
+brasilis,253,59,0	duplicate(จุดตกปลา)	จุดตกปลา#06	10065
